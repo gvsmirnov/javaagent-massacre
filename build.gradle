@@ -1,0 +1,21 @@
+apply plugin: 'java'
+
+task massacre1(type: Jar, dependsOn: ['jar']) {
+    archiveName = 'massacre-1.jar'
+
+    manifest {
+        attributes(
+                "Premain-Class": "ru.jug.gvsmirnov.javaagent.massacre1.NoopAgent",
+                "Main-Class":    "ru.jug.gvsmirnov.javaagent.massacre1.App",
+                "Can-Retransform-Classes": "true"
+        )
+    }
+
+    from {
+        configurations.compile.collect {
+            zipTree(it).matching { exclude 'META-INF/**' }
+        }
+    }
+
+    from zipTree(jar.archivePath)
+}

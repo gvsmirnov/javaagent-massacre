@@ -1,21 +1,24 @@
 apply plugin: 'java'
 
-task massacre1(type: Jar, dependsOn: ['jar']) {
-    archiveName = 'massacre-1.jar'
 
-    manifest {
-        attributes(
-                "Premain-Class": "ru.jug.gvsmirnov.javaagent.massacre1.NoopAgent",
-                "Main-Class":    "ru.jug.gvsmirnov.javaagent.massacre1.App",
-                "Can-Retransform-Classes": "true"
-        )
-    }
+2.times { massacreId ->
+    task "massacre-$massacreId" (type: Jar, dependsOn: ['jar']) {
+        archiveName = "massacre-${massacreId}.jar"
 
-    from {
-        configurations.compile.collect {
-            zipTree(it).matching { exclude 'META-INF/**' }
+        manifest {
+            attributes(
+                    "Premain-Class": "ru.jug.gvsmirnov.javaagent.massacre${massacreId}.Agent",
+                    "Main-Class":    "ru.jug.gvsmirnov.javaagent.massacre${massacreId}.App",
+                    "Can-Retransform-Classes": "true"
+            )
         }
-    }
 
-    from zipTree(jar.archivePath)
+        from {
+            configurations.compile.collect {
+                zipTree(it).matching { exclude 'META-INF/**' }
+            }
+        }
+
+        from zipTree(jar.archivePath)
+    }
 }

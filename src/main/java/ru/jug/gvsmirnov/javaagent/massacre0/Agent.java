@@ -1,17 +1,17 @@
-package ru.jug.gvsmirnov.javaagent.massacre1;
+package ru.jug.gvsmirnov.javaagent.massacre0;
 
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
 
-public class NoopAgent {
+public class Agent {
 
     public static void premain(String agentArgs, Instrumentation inst) {
-        inst.addTransformer(NoopAgent::transform, true);
+        inst.addTransformer(Agent::transform, true);
     }
 
     private static byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
                                     ProtectionDomain protectionDomain, byte[] classfileBuffer) {
-        return null;
+        return classfileBuffer;
     }
 
     /*

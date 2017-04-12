@@ -9,7 +9,7 @@ fi
 
 echo "Running experiment $EXPERIMENT_ID"
 
-./gradlew :clean :massacre$EXPERIMENT_ID
+./gradlew :clean :massacre-$EXPERIMENT_ID
 
 JAR_FILE=build/libs/massacre-$EXPERIMENT_ID.jar
 

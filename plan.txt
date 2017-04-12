@@ -1,0 +1,87 @@
+# Example 1: simplest possible agent
+
+  1. Example agent: retransform + return originalBytes
+  2. Show how RSS is much bigger
+  3. Show GC logs: not much of a difference
+  4. Use NativeMemoryTracking
+  5. Disable retransformation
+  6. RTFM (or RTFS)?
+  7. return null
+
+# Example 2: do some simple instrumentation
+
+  1. An instrumentation with a subtle bug
+  2. Nothing happens? (fry)
+  3. Oh dear, it silently drops it!
+  4. Use ASM verifier
+
+# Example 3: agent has dependencies conflicting with those of the app
+
+  1. Simple agent with an old version of a dependency
+  2. Simple app with a newer version of a dependency
+  3. Open logs
+  4. See NoSuchMethodException
+  5. Сука асм хейтер ебаный
+  7. -XX:+UnlockDiagnosticVMOptions -XX:+TraceClassLoading Examine classes and where they come from
+  8. use relocate
+
+# Example 4: I just wanted to get some annotations, man
+  => https://bitbucket.org/plumbr/plumbr/pull-requests/3275/fixed-a-deadlocking-issue-during/diff
+
+# Example 5: use JVMTI to track class loading events
+  1. OK, we're going native now. Talk about how it is the DANGER ZONE.
+     No matter how competent you are (even if you're Ago), you will still
+     end up segfaulting. We've had dozens of missed null checks.
+
+  2. OK, now do something very very simple. Track class loading and pass that to Java
+     => https://plumbr.atlassian.net/browse/DTS-2511
+
+  3. OK, we can also fuck up using some other methods as well:
+     => Ah, annotations again!
+
+# Example 6: some silly accidental perf degradations
+  (These will be slides. Running benches as a demo is too long)
+
+  * Break escape analysis
+  * Bloat methods past inlining threshold
+  * JVMTI tagging: gc epilogue is single-threaded
+  * Add another implementor of a n interface, end up with megamorphic callsites
+
+  -------
+  N. There are some legit things that result in perf degradations. Can't really do anything about it.
+     Tradeoffs, tradeoffs! If your application is fucking slow anyway, you can endure an intrusive agent
+
+# Example N + 1: really weird and misleading verifier shit
+  => https://plumbr.atlassian.net/browse/DTS-2057
+
+  1. WTF, we have this asm verifier. Why does it not help?
+  2. Dump class, try to load
+  2. WTF, why is the class def not found?
+  3. WTF, error changes when using another verifier?
+  4. WTF!!!
+
+----------------------------------------------------------------
+
+Just mention as a list:
+
+1. Conflicting versions of dependencies
+
+2. Conflicting resources (version.properties)
+   => https://plumbr.atlassian.net/browse/DTS-2524
+
+3. Transforming dynamically created classes (e.g. druid queries)
+   => https://plumbr.atlassian.net/browse/DTS-2548
+
+4. Invalid signatures
+   => https://plumbr.atlassian.net/browse/DTS-2580
+
+5. Incompatible class change: when using classes from agent
+   and also instrumenting with that agent
+   => https://plumbr.atlassian.net/browse/DTS-2609
+
+6. Resource overusage
+   => https://plumbr.atlassian.net/browse/DTS-2511
+
+7. Working with other agents
+
+----------------------------------------------------------------

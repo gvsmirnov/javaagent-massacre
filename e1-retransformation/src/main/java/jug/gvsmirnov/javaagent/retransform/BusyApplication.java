@@ -1,6 +1,6 @@
-package ru.jug.gvsmirnov.javaagent.retransform;
+package jug.gvsmirnov.javaagent.retransform;
 
-import ru.jug.gvsmirnov.toolbox.BottomlessClassLoader;
+import jug.gvsmirnov.toolbox.BottomlessClassLoader;
 
 public class BusyApplication {
 

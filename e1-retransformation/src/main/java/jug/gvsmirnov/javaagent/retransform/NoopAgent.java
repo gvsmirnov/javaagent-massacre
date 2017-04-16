@@ -1,4 +1,4 @@
-package ru.jug.gvsmirnov.javaagent.retransform;
+package jug.gvsmirnov.javaagent.retransform;
 
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
@@ -6,6 +6,7 @@ import java.security.ProtectionDomain;
 public class NoopAgent {
 
     public static void premain(String agentArgs, Instrumentation inst) {
+        System.out.println("Hello, premain!");
         inst.addTransformer(NoopAgent::transform, true);
     }
 

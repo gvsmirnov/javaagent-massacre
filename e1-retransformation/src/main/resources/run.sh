@@ -1,19 +1,8 @@
 #!/usr/bin/env sh
 
-if [ -z ${1+x} ]; then
-  echo "Usage: run.sh <experiment_id>"
-  exit 1
-else
-  EXPERIMENT_ID=$1
-fi
-
-echo "Running experiment $EXPERIMENT_ID"
-
-./gradlew :clean :massacre-$EXPERIMENT_ID
-
-JAR_FILE=build/libs/massacre-$EXPERIMENT_ID.jar
-
 START=`date +%s`
+
+
 
 java -verbose:gc -XX:+PrintGCTimeStamps -Xloggc:exp.$EXPERIMENT_ID.noa.gc.log -Djavaagent:$JAR_FILE -jar $JAR_FILE &
 

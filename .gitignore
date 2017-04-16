@@ -3,3 +3,4 @@ build
 .idea
 exp.*.txt
 exp.*.log
+.gradletasknamecache

@@ -1,4 +1,4 @@
-package ru.jug.gvsmirnov.toolbox;
+package jug.gvsmirnov.toolbox;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

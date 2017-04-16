@@ -3,6 +3,8 @@ package jug.gvsmirnov.javaagent.os;
 import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.ProcessResult;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.List;
@@ -30,15 +32,12 @@ public class MacOsHacks extends Hacks {
     @Override
     public long getResidentSetSize(int pid) {
         return wrapCheckedExceptions(() -> {
-            ProcessResult processResult = new ProcessExecutor("ps", "-o", "rss", "-p", Integer.toString(pid))
+            final ProcessResult processResult = new ProcessExecutor()
+                    .command("ps", "-o", "rss", "-p", Integer.toString(pid))
                     .readOutput(true)
                     .execute();
 
-            for (String line : processResult.getOutput().getLines()) {
-                System.out.println("PROCESS << " + line);
-            }
-
-            return 0;
+            return Long.valueOf(processResult.getOutput().getLines().get(1).trim()) * 1024;
         });
     }
 

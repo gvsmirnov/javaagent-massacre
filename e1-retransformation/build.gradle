@@ -39,6 +39,8 @@ task agentJar(type: Jar, dependsOn: ['jar']) {
     }
 }
 
+// TODO: de-duplicate this
+
 task runBaseline(dependsOn: appJar, type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     systemProperties = [
@@ -58,4 +60,46 @@ task runAgent(dependsOn: [appJar, agentJar], type: JavaExec) {
 
     main = 'jug.gvsmirnov.javaagent.retransform.Setup'
     args 'agent'
+}
+
+task runBaselineAndMonitorRss(dependsOn: appJar, type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    systemProperties = [
+        'app.jar.path': appJar.archivePath
+    ]
+
+    main = 'jug.gvsmirnov.javaagent.retransform.Setup'
+    args 'baseline-rss'
+}
+
+task runAgentAndMonitorRss(dependsOn: [appJar, agentJar], type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    systemProperties = [
+            'app.jar.path': appJar.archivePath,
+            'agent.jar.path': agentJar.archivePath
+    ]
+
+    main = 'jug.gvsmirnov.javaagent.retransform.Setup'
+    args 'agent-rss'
+}
+
+task runBaselineAndTrackNativeMemory(dependsOn: appJar, type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    systemProperties = [
+        'app.jar.path': appJar.archivePath
+    ]
+
+    main = 'jug.gvsmirnov.javaagent.retransform.Setup'
+    args 'baseline-nmt'
+}
+
+task runAgentAndTrackNativeMemory(dependsOn: [appJar, agentJar], type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    systemProperties = [
+            'app.jar.path': appJar.archivePath,
+            'agent.jar.path': agentJar.archivePath
+    ]
+
+    main = 'jug.gvsmirnov.javaagent.retransform.Setup'
+    args 'agent-nmt'
 }

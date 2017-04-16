@@ -8,7 +8,11 @@ public class BadThings {
         try {
             return callable.call();
         } catch (Throwable t) {
-            throw new RuntimeException(t);
+            if (t instanceof RuntimeException) {
+                throw (RuntimeException) t;
+            } else {
+                throw new RuntimeException(t);
+            }
         }
     }
 

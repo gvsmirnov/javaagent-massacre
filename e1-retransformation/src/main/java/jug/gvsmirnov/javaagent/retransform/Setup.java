@@ -21,6 +21,9 @@ public class Setup {
             case "baseline-rss": return baselineRss(builder);
             case "agent-rss":    return agentRss(builder);
 
+            case "baseline-nmt": return baselineNmt(builder);
+            case "agent-nmt":    return agentNmt(builder);
+
             default: throw new IllegalArgumentException("Unknown setup: " + setupName);
         }
     }
@@ -35,6 +38,14 @@ public class Setup {
 
     private static ExperimentBuilder agentRss(ExperimentBuilder builder) {
         return builder.withAgent(agentJarPath).trackResidentSetSize(true);
+    }
+
+    private static ExperimentBuilder baselineNmt(ExperimentBuilder builder) {
+        return builder.trackResidentSetSize(true).trackNativeMemory(true);
+    }
+
+    private static ExperimentBuilder agentNmt(ExperimentBuilder builder) {
+        return builder.withAgent(agentJarPath).trackResidentSetSize(true).trackNativeMemory(true);
     }
 
 }

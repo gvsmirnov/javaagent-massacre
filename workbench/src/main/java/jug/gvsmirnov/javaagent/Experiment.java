@@ -1,5 +1,6 @@
 package jug.gvsmirnov.javaagent;
 
+import jug.gvsmirnov.javaagent.measurement.Measurement;
 import jug.gvsmirnov.javaagent.os.Hacks;
 import jug.gvsmirnov.toolbox.BadThings;
 import org.slf4j.Logger;
@@ -11,23 +12,23 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static java.util.stream.Collectors.toList;
+
 public class Experiment {
 
     private static final Logger log = LoggerFactory.getLogger(Experiment.class);
 
     private final File outputRoot;
     private final List<String> command;
-    private final Collection<Measurement> measurements;
+    private final Collection<MeasurementFactory> measurementFactories;
 
-    public Experiment(File outputRoot, List<String> command, Collection<Measurement> measurements) {
+    public Experiment(File outputRoot, List<String> command, Collection<MeasurementFactory> measurementFactories) {
         this.outputRoot = outputRoot;
         this.command = command;
-        this.measurements = measurements;
+        this.measurementFactories = measurementFactories;
     }
 
     public void perform() {
-        log.info("Will perform measurements: {}", measurements);
-
         if (outputRoot.mkdirs()) {
             log.debug("Created dir: {}", outputRoot.getAbsolutePath());
         }
@@ -51,11 +52,15 @@ public class Experiment {
 
         log.debug("Experiment PID: {}", pid);
 
-        for(int i = 0; i < 10; i ++) {
+        final Collection<Measurement> measurements = measurementFactories.stream()
+                .map(factory -> factory.make(pid))
+                .collect(toList());
+
+        for(int i = 0; i < 15; i ++) {
             experiment.waitFor(1, TimeUnit.SECONDS);
 
             for(Measurement measurement : measurements) {
-                log.debug("Measurement {}: {}", measurement.name(), measurement.take(pid));
+                log.debug("Measurement '{}': {}", measurement.name(), measurement.take(i));
             }
         }
 

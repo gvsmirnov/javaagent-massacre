@@ -1,25 +1,32 @@
 package jug.gvsmirnov.javaagent;
 
 
+import jug.gvsmirnov.javaagent.measurement.Measurement;
+import jug.gvsmirnov.javaagent.measurement.ResidentSetSize;
+import jug.gvsmirnov.javaagent.measurement.SampleNativeMemoryTracking;
+
 import java.io.File;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class ExperimentBuilder {
 
     private final String name;
+    private final File outputRoot;
+
     private String agentJarPath;
     private String applicationJarPath;
 
     private boolean trackResidentSetSize = false;
+    private boolean trackNativeMemory    = false;
 
     public ExperimentBuilder(String name) {
+        Objects.requireNonNull(name, "Experiment name must not be null");
+
         this.name = name;
+        // TODO: rootDir = System.getProperty("root.dir", "build/experiment");
+        this.outputRoot = new File(new File("build", name), now());
     }
 
     public ExperimentBuilder applicationJar(String path) {
@@ -42,49 +49,68 @@ public class ExperimentBuilder {
         return this;
     }
 
+    public ExperimentBuilder trackNativeMemory(boolean trackNativeMemory) {
+        this.trackNativeMemory = trackNativeMemory;
+        return this;
+    }
+
     public Experiment build() {
         validate();
         return new Experiment(getOutputRoot(), buildCommand(), buildMeasurements());
     }
 
-    // TODO: private static final String rootDir            = System.getProperty("root.dir", "build/experiment");
     private File getOutputRoot() {
-        return new File(new File("build", name), now());
+        return outputRoot;
     }
 
     private List<String> buildCommand() {
-        final List<String> result = new ArrayList<>();
+        final List<String> command = new ArrayList<>();
 
-        result.add("java");
-        result.add("-jar");
+        command.add("java");
+        command.add("-jar");
+        command.add("-Xms64m");
+        command.add("-Xmx64m");
 
         if (agentJarPath != null) {
-            result.add("-javaagent:" + agentJarPath);
+            command.add("-javaagent:" + agentJarPath);
         }
 
-        result.add(applicationJarPath);
+        if (trackNativeMemory) {
+            command.add("-XX:NativeMemoryTracking=summary");
+        }
 
-        return result;
+        command.add(applicationJarPath);
+
+        return command;
     }
 
-    private Collection<Measurement> buildMeasurements() {
-        final List<Measurement> result = new ArrayList<>();
+    private Collection<MeasurementFactory> buildMeasurements() {
+        final List<MeasurementFactory> result = new ArrayList<>();
 
         if (trackResidentSetSize) {
-            result.add(new Measurement.ResidentSetSize());
+            result.add(ResidentSetSize::new);
+        }
+
+        if (trackNativeMemory) {
+            result.add(javaPid -> new SampleNativeMemoryTracking(outputRoot, javaPid));
         }
 
         return result;
     }
 
     private void validate() {
-        Objects.requireNonNull(name, "Experiment must have a name");
+        Objects.requireNonNull(applicationJarPath, "Must specify a jar file");
 
-        // TODO: throw if app jar doe not exist
-        // TODO: throw if agent jar doe not exist
+        if (!new File(applicationJarPath).exists()) {
+            throw new IllegalArgumentException("Application jar file does not exist at " + applicationJarPath);
+        }
+
+        if (agentJarPath != null && !new File(agentJarPath).exists()) {
+            throw new IllegalArgumentException("Agent jar file does not exist at " + applicationJarPath);
+        }
     }
 
     private static String now() {
-        return DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(LocalDateTime.now());
+        return DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss").format(LocalDateTime.now());
     }
 }

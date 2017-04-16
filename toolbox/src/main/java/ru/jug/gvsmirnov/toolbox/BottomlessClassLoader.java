@@ -1,4 +1,4 @@
-package ru.jug.gvsmirnov.javaagent.perversions;
+package ru.jug.gvsmirnov.toolbox;
 
 public class BottomlessClassLoader {
 

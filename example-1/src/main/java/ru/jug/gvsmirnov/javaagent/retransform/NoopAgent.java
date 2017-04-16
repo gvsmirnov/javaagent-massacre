@@ -1,12 +1,12 @@
-package ru.jug.gvsmirnov.javaagent.massacre0;
+package ru.jug.gvsmirnov.javaagent.retransform;
 
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
 
-public class Agent {
+public class NoopAgent {
 
     public static void premain(String agentArgs, Instrumentation inst) {
-        inst.addTransformer(Agent::transform, true);
+        inst.addTransformer(NoopAgent::transform, true);
     }
 
     private static byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,

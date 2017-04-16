@@ -1,24 +1,7 @@
-apply plugin: 'java'
-
-
-2.times { massacreId ->
-    task "massacre-$massacreId" (type: Jar, dependsOn: ['jar']) {
-        archiveName = "massacre-${massacreId}.jar"
-
-        manifest {
-            attributes(
-                    "Premain-Class": "ru.jug.gvsmirnov.javaagent.massacre${massacreId}.Agent",
-                    "Main-Class":    "ru.jug.gvsmirnov.javaagent.massacre${massacreId}.App",
-                    "Can-Retransform-Classes": "true"
-            )
+allprojects {
+    task hello {
+        doLast { task ->
+            println "I'm $task.project.name"
         }
-
-        from {
-            configurations.compile.collect {
-                zipTree(it).matching { exclude 'META-INF/**' }
-            }
-        }
-
-        from zipTree(jar.archivePath)
     }
 }

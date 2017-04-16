@@ -1,4 +1,4 @@
-package ru.jug.gvsmirnov.javaagent.perversions;
+package ru.jug.gvsmirnov.toolbox;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

@@ -1,8 +1,8 @@
-package ru.jug.gvsmirnov.javaagent.massacre0;
+package ru.jug.gvsmirnov.javaagent.retransform;
 
-import ru.jug.gvsmirnov.javaagent.perversions.BottomlessClassLoader;
+import ru.jug.gvsmirnov.toolbox.BottomlessClassLoader;
 
-public class App {
+public class BusyApplication {
 
     public static volatile Object sink;
 
@@ -13,7 +13,7 @@ public class App {
             sink = BottomlessClassLoader.loadBigClass();
 
             if ((loaded++ % 10_000L) == 0L) {
-                System.out.println("Loaded " + sink);
+                System.out.println("Loaded " + loaded + " classes");
                 Thread.sleep(1);
             }
         }

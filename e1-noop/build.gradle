@@ -1,5 +1,4 @@
 apply plugin: 'java'
-apply plugin: 'application'
 
 repositories {
     jcenter()
@@ -15,7 +14,7 @@ task appJar(type: Jar, dependsOn: ['jar']) {
 
     manifest {
         attributes(
-            "Main-Class":    "jug.gvsmirnov.javaagent.retransform.BusyApplication",
+            "Main-Class":    "jug.gvsmirnov.javaagent.noop.BusyApplication",
         )
     }
 
@@ -33,7 +32,7 @@ task agentJar(type: Jar, dependsOn: ['jar']) {
 
     manifest {
         attributes(
-                "Premain-Class": "jug.gvsmirnov.javaagent.retransform.NoopAgent",
+                "Premain-Class": "jug.gvsmirnov.javaagent.noop.NoopAgent",
                 "Can-Retransform-Classes": "true"
         )
     }
@@ -47,7 +46,7 @@ task runBaseline(dependsOn: appJar, type: JavaExec) {
         'app.jar.path': appJar.archivePath
     ]
 
-    main = 'jug.gvsmirnov.javaagent.retransform.Setup'
+    main = 'jug.gvsmirnov.javaagent.noop.Setup'
     args 'baseline'
 }
 
@@ -58,7 +57,7 @@ task runAgent(dependsOn: [appJar, agentJar], type: JavaExec) {
             'agent.jar.path': agentJar.archivePath
     ]
 
-    main = 'jug.gvsmirnov.javaagent.retransform.Setup'
+    main = 'jug.gvsmirnov.javaagent.noop.Setup'
     args 'agent'
 }
 
@@ -68,7 +67,7 @@ task runBaselineAndMonitorRss(dependsOn: appJar, type: JavaExec) {
         'app.jar.path': appJar.archivePath
     ]
 
-    main = 'jug.gvsmirnov.javaagent.retransform.Setup'
+    main = 'jug.gvsmirnov.javaagent.noop.Setup'
     args 'baseline-rss'
 }
 
@@ -79,7 +78,7 @@ task runAgentAndMonitorRss(dependsOn: [appJar, agentJar], type: JavaExec) {
             'agent.jar.path': agentJar.archivePath
     ]
 
-    main = 'jug.gvsmirnov.javaagent.retransform.Setup'
+    main = 'jug.gvsmirnov.javaagent.noop.Setup'
     args 'agent-rss'
 }
 
@@ -89,7 +88,7 @@ task runBaselineAndTrackNativeMemory(dependsOn: appJar, type: JavaExec) {
         'app.jar.path': appJar.archivePath
     ]
 
-    main = 'jug.gvsmirnov.javaagent.retransform.Setup'
+    main = 'jug.gvsmirnov.javaagent.noop.Setup'
     args 'baseline-nmt'
 }
 
@@ -100,6 +99,6 @@ task runAgentAndTrackNativeMemory(dependsOn: [appJar, agentJar], type: JavaExec)
             'agent.jar.path': agentJar.archivePath
     ]
 
-    main = 'jug.gvsmirnov.javaagent.retransform.Setup'
+    main = 'jug.gvsmirnov.javaagent.noop.Setup'
     args 'agent-nmt'
 }

@@ -5,9 +5,10 @@ import jug.gvsmirnov.javaagent.os.Hacks;
 import jug.gvsmirnov.toolbox.BadThings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.zeroturnaround.exec.ProcessExecutor;
+import org.zeroturnaround.exec.stream.slf4j.Slf4jDebugOutputStream;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -16,16 +17,26 @@ import static java.util.stream.Collectors.toList;
 
 public class Experiment {
 
-    private static final Logger log = LoggerFactory.getLogger(Experiment.class);
+    private static final int iterations   = 15; // TODO: parametrize
+
+    private static final Logger       log = LoggerFactory.getLogger(Experiment.class);
+    private static final Logger stdOutLog = LoggerFactory.getLogger(Experiment.class.getName() + ".stdout");
+    private static final Logger stdErrLog = LoggerFactory.getLogger(Experiment.class.getName() + ".stderr");
 
     private final File outputRoot;
     private final List<String> command;
     private final Collection<MeasurementFactory> measurementFactories;
 
-    public Experiment(File outputRoot, List<String> command, Collection<MeasurementFactory> measurementFactories) {
+    private final boolean logStdOut;
+    private final boolean logStdErr;
+
+    public Experiment(File outputRoot, List<String> command, Collection<MeasurementFactory> measurementFactories,
+                      boolean logStdOut, boolean logStdErr) {
         this.outputRoot = outputRoot;
         this.command = command;
         this.measurementFactories = measurementFactories;
+        this.logStdOut = logStdOut;
+        this.logStdErr = logStdErr;
     }
 
     public void perform() {
@@ -33,7 +44,7 @@ public class Experiment {
             log.debug("Created dir: {}", outputRoot.getAbsolutePath());
         }
 
-        log.debug("Experiment output will be piped to " + outputRoot.getAbsolutePath());
+        log.debug("Experiment data will be written to " + outputRoot.getAbsolutePath());
 
         log.info("Starting experiment: {}", command);
 
@@ -43,12 +54,15 @@ public class Experiment {
     }
 
     private int performExperiment() throws InterruptedException, IOException {
-        final Process experiment = new ProcessBuilder(command)
-                .redirectError (new File(outputRoot, "stderr.log"))
-                .redirectOutput(new File(outputRoot, "stdout.log"))
-                .start();
 
-        final int pid = Hacks.hacks.getPid(experiment);
+        Process javaProcess = new ProcessExecutor(command)
+                .redirectOutput(getStdOutRedirect())
+                .redirectError(getStdErrRedirect())
+                .start().getProcess();
+
+        // TODO: kill the child process when parent is killed
+
+        final int pid = Hacks.hacks.getPid(javaProcess);
 
         log.debug("Experiment PID: {}", pid);
 
@@ -56,18 +70,39 @@ public class Experiment {
                 .map(factory -> factory.make(pid))
                 .collect(toList());
 
-        for(int i = 0; i < 15; i ++) {
-            experiment.waitFor(1, TimeUnit.SECONDS);
+        for(int iteration = 0; iteration < iterations; iteration ++) {
+            if (javaProcess.waitFor(1, TimeUnit.SECONDS)) {
+                return javaProcess.exitValue();
+            }
 
             for(Measurement measurement : measurements) {
-                log.debug("Measurement '{}': {}", measurement.name(), measurement.take(i));
+                log.debug("Measurement '{}': {}", measurement.name(), measurement.take(iteration));
             }
         }
 
         log.info("Terminating experiment");
 
-        experiment.destroy();
+        javaProcess.destroy();
 
-        return experiment.waitFor();
+        return javaProcess.waitFor();
     }
+
+    // TODO: deduplicate
+    private OutputStream getStdOutRedirect() throws FileNotFoundException {
+        if (this.logStdOut) {
+            return new Slf4jDebugOutputStream(stdOutLog);
+        } else {
+            return new FileOutputStream(new File(outputRoot, "stdout.log"));
+        }
+    }
+
+    private OutputStream getStdErrRedirect() throws FileNotFoundException {
+        if (this.logStdErr) {
+            return new Slf4jDebugOutputStream(stdErrLog);
+        } else {
+            return new FileOutputStream(new File(outputRoot, "stderr.log"));
+        }
+    }
+
+
 }

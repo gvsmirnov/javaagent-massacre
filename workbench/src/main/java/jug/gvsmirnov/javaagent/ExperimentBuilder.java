@@ -1,7 +1,6 @@
 package jug.gvsmirnov.javaagent;
 
 
-import jug.gvsmirnov.javaagent.measurement.Measurement;
 import jug.gvsmirnov.javaagent.measurement.ResidentSetSize;
 import jug.gvsmirnov.javaagent.measurement.SampleNativeMemoryTracking;
 
@@ -20,6 +19,9 @@ public class ExperimentBuilder {
 
     private boolean trackResidentSetSize = false;
     private boolean trackNativeMemory    = false;
+
+    private boolean logStdOut = false;
+    private boolean logStdErr = false;
 
     public ExperimentBuilder(String name) {
         Objects.requireNonNull(name, "Experiment name must not be null");
@@ -54,9 +56,19 @@ public class ExperimentBuilder {
         return this;
     }
 
+    public ExperimentBuilder logStdOut() {
+        this.logStdOut = true;
+        return this;
+    }
+
+    public ExperimentBuilder logStdErr() {
+        this.logStdErr = true;
+        return this;
+    }
+
     public Experiment build() {
         validate();
-        return new Experiment(getOutputRoot(), buildCommand(), buildMeasurements());
+        return new Experiment(getOutputRoot(), buildCommand(), buildMeasurements(), logStdOut, logStdErr);
     }
 
     private File getOutputRoot() {
@@ -68,7 +80,7 @@ public class ExperimentBuilder {
 
         command.add("java");
         command.add("-jar");
-        command.add("-Xms64m");
+        command.add("-Xms64m"); // TODO: parametrize
         command.add("-Xmx64m");
 
         if (agentJarPath != null) {

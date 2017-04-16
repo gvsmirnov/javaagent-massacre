@@ -1,5 +1,7 @@
 package jug.gvsmirnov.toolbox;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.concurrent.Callable;
 
 public class BadThings {
@@ -14,6 +16,24 @@ public class BadThings {
                 throw new RuntimeException(t);
             }
         }
+    }
+
+    public static volatile Object sink;
+
+    public static void expandHeap() {
+        // Doing -XX:+AlwaysPreTouch masks the effect on Internal structures
+        // Therefore, we just make the heap expand by becoming very fat
+
+        try {
+            final Collection<byte[]> garbage = new ArrayList<>();
+
+            while (true) {
+                final byte[] bytes = new byte[64 * 1024];
+
+                sink = bytes;
+                garbage.add(bytes);
+            }
+        } catch (OutOfMemoryError ignored) {}
     }
 
 }

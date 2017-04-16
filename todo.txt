@@ -1,4 +1,0 @@
-Each massacre to its own module
-Gradle tasks demonstrating each massacre and all its steps
-
-Advertise JVM keys useful for low-level troubleshooting

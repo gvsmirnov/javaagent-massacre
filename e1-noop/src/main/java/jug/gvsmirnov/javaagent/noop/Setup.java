@@ -1,4 +1,4 @@
-package jug.gvsmirnov.javaagent.retransform;
+package jug.gvsmirnov.javaagent.noop;
 
 import jug.gvsmirnov.javaagent.ExperimentBuilder;
 
@@ -12,7 +12,8 @@ public class Setup {
     }
 
     private static ExperimentBuilder makeExperimentalSetup(String setupName) {
-        final ExperimentBuilder builder = new ExperimentBuilder(setupName).applicationJar(applicationJarPath);
+        final ExperimentBuilder builder = new ExperimentBuilder(setupName)
+                .applicationJar(applicationJarPath);
 
         switch (setupName) {
             case "baseline":     return builder;

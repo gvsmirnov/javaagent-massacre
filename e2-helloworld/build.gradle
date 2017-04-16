@@ -1,0 +1,64 @@
+apply plugin: 'java'
+
+// TOOD: deduplicate
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile project(':toolbox')
+    compile project(':workbench')
+}
+
+task appJar(type: Jar, dependsOn: ['jar']) {
+    archiveName = "busy-application.jar"
+
+    manifest {
+        attributes(
+                "Main-Class":    "jug.gvsmirnov.javaagent.helloworld.HelloWorldApplication",
+        )
+    }
+
+    from {
+        configurations.compile.collect {
+            zipTree(it).matching { exclude 'META-INF/**' }
+        }
+    }
+
+    from zipTree(jar.archivePath)
+}
+
+task agentJar(type: Jar, dependsOn: ['jar']) {
+    archiveName = "noop-agent.jar"
+
+    manifest {
+        attributes(
+                "Premain-Class": "jug.gvsmirnov.javaagent.helloworld.HelloWorldAgent",
+        )
+    }
+}
+
+
+// TODO: de-duplicate this
+
+task runBaseline(dependsOn: appJar, type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    systemProperties = [
+            'app.jar.path': appJar.archivePath
+    ]
+
+    main = 'jug.gvsmirnov.javaagent.helloworld.Setup'
+    args 'baseline'
+}
+
+task runAgent(dependsOn: [appJar, agentJar], type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    systemProperties = [
+            'app.jar.path': appJar.archivePath,
+            'agent.jar.path': agentJar.archivePath
+    ]
+
+    main = 'jug.gvsmirnov.javaagent.helloworld.Setup'
+    args 'agent'
+}

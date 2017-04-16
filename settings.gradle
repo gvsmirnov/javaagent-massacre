@@ -1,1 +1,3 @@
-include 'e1-retransformation', 'toolbox', 'workbench'
+include 'e1-noop', 'e2-helloworld'
+
+include 'toolbox', 'workbench'

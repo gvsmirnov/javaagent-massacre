@@ -1,0 +1,113 @@
+apply plugin: 'java'
+apply plugin: 'c'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile project(':toolbox')
+    compile project(':workbench')
+}
+
+task appJar(type: Jar, dependsOn: ['jar']) {
+    archiveName = "application.jar"
+
+    manifest {
+        attributes(
+                "Main-Class":    "jug.gvsmirnov.javaagent.jvmti.HelloWorldApplication",
+        )
+    }
+
+    from {
+        configurations.compile.collect {
+            zipTree(it).matching { exclude 'META-INF/**' }
+        }
+    }
+
+    from zipTree(jar.archivePath)
+}
+
+model {
+    components {
+        main(NativeLibrarySpec) {
+            binaries.all {
+                def javaHome = org.gradle.internal.jvm.Jvm.current().javaHome
+
+                cCompiler.args '-I', "$javaHome/include"
+
+                if (targetPlatform.operatingSystem.linux) {
+                    cCompiler.args '-I', "$javaHome/include/linux"
+                }
+
+                if(targetPlatform.operatingSystem.macOsX) {
+                    cCompiler.args '-I', "$javaHome/include/darwin"
+                }
+
+                if(targetPlatform.operatingSystem.windows) {
+                    cCompiler.args '-I', "$javaHome/include/win32"
+                }
+            }
+        }
+    }
+}
+
+task jniHeaders {
+    def headerFile = new File('src/main/headers/jni_exports.h')
+
+    inputs.files sourceSets.main.output
+    outputs.file headerFile
+
+    doLast {
+        headerFile.parentFile.mkdirs()
+        exec {
+            executable org.gradle.internal.jvm.Jvm.current().getExecutable('javah')
+            args '-o', headerFile
+            args '-classpath', sourceSets.main.output.classesDir
+            args 'jug.gvsmirnov.javaagent.jvmti.JvmtiAgent'
+        }
+    }
+}
+
+task agentJar(type: Jar, dependsOn: ['mainSharedLibrary','jar']) {
+    archiveName = "agent.jar"
+
+    manifest {
+        attributes(
+                "Premain-Class": "jug.gvsmirnov.javaagent.jvmti.JvmtiAgent",
+        )
+    }
+
+    from {
+        configurations.compile.collect {
+            zipTree(it).matching { exclude 'META-INF/**' }
+        }
+    }
+
+    // TODO: un-hardcode
+    from 'build/libs/main/shared/libmain.dylib'
+}
+
+
+// TODO: de-duplicate this
+
+task runBaseline(dependsOn: appJar, type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    systemProperties = [
+            'app.jar.path': appJar.archivePath
+    ]
+
+    main = 'jug.gvsmirnov.javaagent.jvmti.Setup'
+    args 'baseline'
+}
+
+task runAgent(dependsOn: [appJar, agentJar], type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    systemProperties = [
+            'app.jar.path': appJar.archivePath,
+            'agent.jar.path': agentJar.archivePath
+    ]
+
+    main = 'jug.gvsmirnov.javaagent.jvmti.Setup'
+    args 'agent'
+}

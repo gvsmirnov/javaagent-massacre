@@ -23,13 +23,6 @@
   10. Ugh, VerifyError. Compute frames.
   11. Success!
 
-# Example 2: do some simple instrumentation
-
-  1. An instrumentation with a subtle bug
-  2. Nothing happens? (fry)
-  3. Oh dear, it silently drops it!
-  4. Use ASM verifier
-
 # Example 3: agent has dependencies conflicting with those of the app
 
   1. Simple agent with an old version of a dependency

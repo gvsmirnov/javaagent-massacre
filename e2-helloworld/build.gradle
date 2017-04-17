@@ -14,7 +14,7 @@ dependencies {
 }
 
 task appJar(type: Jar, dependsOn: ['jar']) {
-    archiveName = "busy-application.jar"
+    archiveName = "application.jar"
 
     manifest {
         attributes(
@@ -32,7 +32,7 @@ task appJar(type: Jar, dependsOn: ['jar']) {
 }
 
 task agentJar(type: Jar, dependsOn: ['jar']) {
-    archiveName = "noop-agent.jar"
+    archiveName = "agent.jar"
 
     manifest {
         attributes(

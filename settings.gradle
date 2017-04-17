@@ -1,3 +1,2 @@
-include 'e1-noop', 'e2-helloworld'
-
+include 'e1-noop', 'e2-helloworld', 'e3-deps', 'e4-annotations', 'e5-jvmti'
 include 'toolbox', 'workbench'

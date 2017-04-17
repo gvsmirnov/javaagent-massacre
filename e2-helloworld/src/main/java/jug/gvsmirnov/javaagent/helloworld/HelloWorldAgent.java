@@ -2,7 +2,6 @@ package jug.gvsmirnov.javaagent.helloworld;
 
 import org.objectweb.asm.*;
 import org.objectweb.asm.commons.GeneratorAdapter;
-import org.objectweb.asm.commons.Method;
 
 import java.io.PrintStream;
 import java.lang.instrument.ClassFileTransformer;
@@ -16,8 +15,8 @@ import static org.objectweb.asm.Type.getType;
 import static org.objectweb.asm.commons.Method.getMethod;
 
 public class HelloWorldAgent implements ClassFileTransformer {
+
     public static void premain(String agentArgs, Instrumentation inst) {
-        System.out.println("Hello, preworld!");
         inst.addTransformer(new HelloWorldAgent());
     }
 
@@ -25,8 +24,7 @@ public class HelloWorldAgent implements ClassFileTransformer {
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
                                     ProtectionDomain protectionDomain, byte[] classfileBuffer) {
 
-//        if(!className.equals(HelloWorldApplication.class.getName())) {
-        if(!className.equals("jug/gvsmirnov/javaagent/helloworld/HelloWorldApplication")) {
+        if(!className.equals(HelloWorldApplication.class.getName())) {
             return null;
         }
 
@@ -50,19 +48,23 @@ public class HelloWorldAgent implements ClassFileTransformer {
 
                 System.out.println("Replacing method " + methodName);
 
-                return new GeneratorAdapter(
-                        ACC_PUBLIC + ACC_STATIC, getMethod("void main (String[])"), null, null, cw
-                ) {{
-                    getStatic(getType(System.class), "out", getType(PrintStream.class));
-                    push("Hello, transformed world!");
-                    invokeVirtual(getType(PrintStream.class), getMethod("void println (String)"));
-                    returnValue();
-                    endMethod();
-                }};
+                return generateMainMethod();
             }
         };
 
         cr.accept(cv, 0);
         return cw.toByteArray();
+    }
+
+    private static MethodVisitor generateMainMethod(ClassWriter cw) {
+        return new GeneratorAdapter(
+                ACC_PUBLIC + ACC_STATIC, getMethod("void main (String[])"), null, null, cw
+        ) {{
+            getStatic(getType(System.class), "out", getType(PrintStream.class));
+            push("Hello, transformed world!");
+            invokeVirtual(getType(PrintStream.class), getMethod("void println (String)"));
+            returnValue();
+            endMethod();
+        }};
     }
 }

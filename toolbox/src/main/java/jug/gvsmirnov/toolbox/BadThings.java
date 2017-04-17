@@ -18,6 +18,22 @@ public class BadThings {
         }
     }
 
+    public interface ThrowyRunnable {
+        void run() throws Throwable;
+    }
+
+    public static void wrapCheckedExceptions(final ThrowyRunnable r) {
+        try {
+            r.run();
+        } catch (Throwable t) {
+            if (t instanceof RuntimeException) {
+                throw (RuntimeException) t;
+            } else {
+                throw new RuntimeException(t);
+            }
+        }
+    }
+
     public static volatile Object sink;
 
     public static void expandHeap() {

@@ -1,12 +1,27 @@
 # Example 1: simplest possible agent
 
-  1. Example agent: retransform + return originalBytes
-  2. Show how RSS is much bigger
-  3. Show GC logs: not much of a difference
-  4. Use NativeMemoryTracking
-  5. Disable retransformation
-  6. RTFM (or RTFS)?
-  7. return null
+  1.  Example agent: retransform + return originalBytes
+  2.  Show how RSS is much bigger
+  3.  Show GC logs: not much of a difference
+  4.  Use NativeMemoryTracking
+  5.  Disable retransformation
+  6.  RTFM (or RTFS)?
+  7.  return null
+  8.  Success!
+
+# Example 2: do some simple instrumentation
+
+  1.  Hello, world!
+  2.  WTF, why are we not transforming?
+  3.  Print all class names that come to transform()
+  4.  WTF? Trace class loading
+  5.  Ah shit! Don't load the transformed class in agent.
+  6.  Ah shit! Different name formats.
+  7.  OK, doing the transformation now.
+  8.  WTF? Nothing is happening.
+  9.  Silent exception swallowing? Nice. Get rid of this {{}} shit.
+  10. Ugh, VerifyError. Compute frames.
+  11. Success!
 
 # Example 2: do some simple instrumentation
 

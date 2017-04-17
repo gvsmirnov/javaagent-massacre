@@ -9,6 +9,8 @@ repositories {
 dependencies {
     compile project(':toolbox')
     compile project(':workbench')
+
+    compile 'org.ow2.asm:asm-debug-all:5.1'
 }
 
 task appJar(type: Jar, dependsOn: ['jar']) {
@@ -61,4 +63,15 @@ task runAgent(dependsOn: [appJar, agentJar], type: JavaExec) {
 
     main = 'jug.gvsmirnov.javaagent.helloworld.Setup'
     args 'agent'
+}
+
+task runAgentAndTraceClassLoading(dependsOn: [appJar, agentJar], type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    systemProperties = [
+            'app.jar.path': appJar.archivePath,
+            'agent.jar.path': agentJar.archivePath
+    ]
+
+    main = 'jug.gvsmirnov.javaagent.helloworld.Setup'
+    args 'agent-tcl'
 }

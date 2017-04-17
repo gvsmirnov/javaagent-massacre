@@ -19,6 +19,7 @@ public class ExperimentBuilder {
 
     private boolean trackResidentSetSize = false;
     private boolean trackNativeMemory    = false;
+    private boolean traceClassLoading    = false;
 
     private boolean logStdOut = false;
     private boolean logStdErr = false;
@@ -66,21 +67,25 @@ public class ExperimentBuilder {
         return this;
     }
 
-    public Experiment build() {
-        validate();
-        return new Experiment(getOutputRoot(), buildCommand(), buildMeasurements(), logStdOut, logStdErr);
+    public ExperimentBuilder traceClassLoading(boolean traceClassLoading) {
+        this.traceClassLoading = traceClassLoading;
+        return this;
     }
 
-    private File getOutputRoot() {
-        return outputRoot;
+    public Experiment build() {
+        validate();
+        return new Experiment(outputRoot, buildCommand(), buildMeasurements(), logStdOut, logStdErr);
     }
 
     private List<String> buildCommand() {
-        final List<String> command = new ArrayList<>();
+        // LHS to remove duplicates but preserve order
+        final Set<String> command = new LinkedHashSet<>();
 
         command.add("java");
         command.add("-jar");
-        command.add("-Xms64m"); // TODO: parametrize
+
+        // TODO: parametrize
+        command.add("-Xms64m");
         command.add("-Xmx64m");
 
         if (agentJarPath != null) {
@@ -91,9 +96,15 @@ public class ExperimentBuilder {
             command.add("-XX:NativeMemoryTracking=summary");
         }
 
+        if (traceClassLoading) {
+            // TODO: VM log file
+            command.add("-XX:+UnlockDiagnosticVMOptions");
+            command.add("-XX:+TraceClassLoading");
+        }
+
         command.add(applicationJarPath);
 
-        return command;
+        return new ArrayList<>(command);
     }
 
     private Collection<MeasurementFactory> buildMeasurements() {

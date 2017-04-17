@@ -15,11 +15,12 @@ public class Setup {
     private static ExperimentBuilder makeExperimentalSetup(String setupName) {
         final ExperimentBuilder builder = new ExperimentBuilder(setupName)
                 .applicationJar(applicationJarPath)
-                .logStdOut();
+                .logStdOut().logStdErr();
 
         switch (setupName) {
             case "baseline":     return builder;
             case "agent":        return agent(builder);
+            case "agent-tcl":    return agentTcl(builder);
 
             default: throw new IllegalArgumentException("Unknown setup: " + setupName);
         }
@@ -27,6 +28,10 @@ public class Setup {
 
     private static ExperimentBuilder agent(ExperimentBuilder builder) {
         return builder.withAgent(agentJarPath);
+    }
+
+    private static ExperimentBuilder agentTcl(ExperimentBuilder builder) {
+        return builder.withAgent(agentJarPath).traceClassLoading(true);
     }
 
 }

@@ -1,6 +1,5 @@
 build
 .gradle
 .idea
-exp.*.txt
-exp.*.log
 .gradletasknamecache
+hs_err_*

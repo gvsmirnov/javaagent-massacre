@@ -1,6 +1,5 @@
 package jug.gvsmirnov.javaagent.jvmti;
 
-import jug.gvsmirnov.toolbox.BadThings;
 import jug.gvsmirnov.toolbox.NativeUtils;
 
 import java.lang.instrument.Instrumentation;
@@ -8,9 +7,8 @@ import java.lang.instrument.Instrumentation;
 public class JvmtiAgent {
 
     public static void premain(String agentArgs, Instrumentation inst) {
-        BadThings.wrapCheckedExceptions(
-                () -> NativeUtils.loadLibraryFromJar("/libmain.dylib")
-        );
+//        System.out.println("Loading native agent...");
+        NativeUtils.load("/libmain.dylib");
         startNativeAgent();
     }
 

@@ -110,4 +110,8 @@ public class NativeUtils {
         // Finally, load the library
         System.load(temp.getAbsolutePath());
     }
+
+    public static void load(String path) {
+        BadThings.wrapCheckedExceptions(() -> loadLibraryFromJar(path));
+    }
 }

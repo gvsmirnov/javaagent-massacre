@@ -26,6 +26,8 @@ public class ExperimentBuilder {
 
     private int iterations = 15;
 
+    private Collection<String> extraArgs = new LinkedHashSet<>();
+
     public ExperimentBuilder(String name) {
         Objects.requireNonNull(name, "Experiment name must not be null");
 
@@ -79,6 +81,11 @@ public class ExperimentBuilder {
         return this;
     }
 
+    public ExperimentBuilder withJvmArgument(String arg) {
+        this.extraArgs.add(arg);
+        return this;
+    }
+
     public Experiment build() {
         validate();
         return new Experiment(outputRoot, buildCommand(), buildMeasurements(), logStdOut, logStdErr, iterations);
@@ -108,6 +115,8 @@ public class ExperimentBuilder {
             command.add("-XX:+UnlockDiagnosticVMOptions");
             command.add("-XX:+TraceClassLoading");
         }
+
+        command.addAll(extraArgs);
 
         command.add(applicationJarPath);
 

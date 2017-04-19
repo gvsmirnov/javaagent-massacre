@@ -1,0 +1,33 @@
+Compiled from "JvmtiAgent.java"
+public class jug.gvsmirnov.javaagent.jvmti.JvmtiAgent {
+  public jug.gvsmirnov.javaagent.jvmti.JvmtiAgent();
+    Code:
+       0: aload_0
+       1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+       4: return
+
+  public static void premain(java.lang.String, java.lang.instrument.Instrumentation);
+    Code:
+       0: ldc           #2                  // String /libmain.dylib
+       2: invokestatic  #3                  // Method jug/gvsmirnov/toolbox/NativeUtils.load:(Ljava/lang/String;)V
+       5: invokestatic  #4                  // Method startNativeAgent:()V
+       8: return
+
+  public static native void startNativeAgent();
+
+  public static void onClassLoaded(java.lang.Class<?>);
+    Code:
+       0: getstatic     #5                  // Field java/lang/System.out:Ljava/io/PrintStream;
+       3: astore_1
+       4: aload_1
+       5: new           #6                  // class java/lang/StringBuilder
+       8: dup
+       9: invokespecial #7                  // Method java/lang/StringBuilder."<init>":()V
+      12: ldc           #8                  // String Hello,
+      14: invokevirtual #9                  // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      17: aload_0
+      18: invokevirtual #10                 // Method java/lang/StringBuilder.append:(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+      21: invokevirtual #11                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+      24: invokevirtual #12                 // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+      27: return
+}

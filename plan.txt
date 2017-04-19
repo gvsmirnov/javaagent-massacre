@@ -25,29 +25,42 @@
 
 # Example 3: agent has dependencies conflicting with those of the app
 
-  1. Simple agent with an old version of a dependency
-  2. Simple app with a newer version of a dependency
-  3. Open logs
-  4. See NoSuchMethodException
-  5. Сука асм хейтер ебаный
-  7. -XX:+UnlockDiagnosticVMOptions -XX:+TraceClassLoading Examine classes and where they come from
-  8. use relocate
+  1.  Run simple boot app, http get localhost:8080/hello
+  2.  Run with agent. Why does it no longer find the class?
+  3.  Fucking class loaders! Exclude.
+  4.  NoSuchMethodError? Why?
+  5.  Avoid instrumenting servlet. WTF?
+  6.  Remove from classpath?
+  7.  Can't really get all implementors of a class without loading it? Ugh.
+  8.  Use isAnnotatedWith(Controller) and annotatedWith(RequestMapping)
+  9.  OK, but we really want to get all the servlets. Let's get back to it.
 
-# Example 4: I just wanted to get some annotations, man
+# Example 4: use JVMTI to track class loading events
+
+  1.  Disclaimer: doing native shit is dangerous!
+  2.  Do something very very simple. Track class loading and pass that to Java
+  3.  NPE? Where does that come from? Add checks
+  4.  Let's log the class name from native code using Class.getName()!
+  5.  Right. Check exception after getting method ID.
+  6.  What the hell is this? Explore some hotspot sources.
+  7.  Use (*jni)->ExceptionClear(jni);
+  8.  NoSuchMethodError: getName?
+  9.  OK, let's just use toString()
+  10. Yay! OK, now also do java.
+  11. Nothing happening if we do it before. How about we do it after?
+  12. check_exception(jni, "JvmtiAgent#onClassLoaded");
+  13. Log depth when leaving and exiting
+
+  => (see also: https://bugs.openjdk.java.net/browse/JDK-8153202)
+  => We can also fuck up using some other methods as well. Annotations.
+  => CircularClassShit
+
+# Example 5: I just wanted to get some annotations, man
   => https://bitbucket.org/plumbr/plumbr/pull-requests/3275/fixed-a-deadlocking-issue-during/diff
 
-# Example 5: use JVMTI to track class loading events
-  1. OK, we're going native now. Talk about how it is the DANGER ZONE.
-     No matter how competent you are (even if you're Ago), you will still
-     end up segfaulting. We've had dozens of missed null checks.
 
-  2. OK, now do something very very simple. Track class loading and pass that to Java
-     => https://plumbr.atlassian.net/browse/DTS-2511
 
-  3. OK, we can also fuck up using some other methods as well:
-     => Ah, annotations again!
-
-# Example 6: some silly accidental perf degradations
+# Example 6: perf degradations
   (These will be slides. Running benches as a demo is too long)
 
   * Break escape analysis
@@ -72,24 +85,22 @@
 
 Just mention as a list:
 
-1. Conflicting versions of dependencies
-
-2. Conflicting resources (version.properties)
+ * Conflicting resources (version.properties)
    => https://plumbr.atlassian.net/browse/DTS-2524
 
-3. Transforming dynamically created classes (e.g. druid queries)
+ * Transforming dynamically created classes (e.g. druid queries)
    => https://plumbr.atlassian.net/browse/DTS-2548
 
-4. Invalid signatures
+ * Invalid signatures
    => https://plumbr.atlassian.net/browse/DTS-2580
 
-5. Incompatible class change: when using classes from agent
+ * Incompatible class change: when using classes from agent
    and also instrumenting with that agent
    => https://plumbr.atlassian.net/browse/DTS-2609
 
-6. Resource overusage
+ * Resource overusage
    => https://plumbr.atlassian.net/browse/DTS-2511
 
-7. Working with other agents
+ * Working with other agents
 
 ----------------------------------------------------------------

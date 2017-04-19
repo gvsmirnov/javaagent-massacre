@@ -20,6 +20,7 @@ public class Setup {
         switch (setupName) {
             case "baseline":     return builder;
             case "agent":        return agent(builder);
+            case "agent-tcl":    return agentTcl(builder);
 
             default: throw new IllegalArgumentException("Unknown setup: " + setupName);
         }

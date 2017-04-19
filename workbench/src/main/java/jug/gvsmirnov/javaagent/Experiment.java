@@ -17,8 +17,6 @@ import static java.util.stream.Collectors.toList;
 
 public class Experiment {
 
-    private static final int iterations   = 15; // TODO: parametrize
-
     private static final Logger       log = LoggerFactory.getLogger(Experiment.class);
     private static final Logger stdOutLog = LoggerFactory.getLogger(Experiment.class.getName() + ".stdout");
     private static final Logger stdErrLog = LoggerFactory.getLogger(Experiment.class.getName() + ".stderr");
@@ -30,13 +28,16 @@ public class Experiment {
     private final boolean logStdOut;
     private final boolean logStdErr;
 
+    private final int iterations;
+
     public Experiment(File outputRoot, List<String> command, Collection<MeasurementFactory> measurementFactories,
-                      boolean logStdOut, boolean logStdErr) {
+                      boolean logStdOut, boolean logStdErr, int iterations) {
         this.outputRoot = outputRoot;
         this.command = command;
         this.measurementFactories = measurementFactories;
         this.logStdOut = logStdOut;
         this.logStdErr = logStdErr;
+        this.iterations = iterations;
     }
 
     public void perform() {
@@ -46,7 +47,7 @@ public class Experiment {
 
         log.debug("Experiment data will be written to " + outputRoot.getAbsolutePath());
 
-        log.info("Starting experiment: {}", command);
+        log.info("Starting experiment: {}", String.join(" ", command));
 
         int exitCode = BadThings.wrapCheckedExceptions(this::performExperiment);
 
@@ -55,12 +56,12 @@ public class Experiment {
 
     private int performExperiment() throws InterruptedException, IOException {
 
-        Process javaProcess = new ProcessExecutor(command)
+        final Process javaProcess = new ProcessExecutor(command)
                 .redirectOutput(getStdOutRedirect())
                 .redirectError(getStdErrRedirect())
                 .start().getProcess();
 
-        // TODO: kill the child process when parent is killed
+        Runtime.getRuntime().addShutdownHook(new Thread(javaProcess::destroy));
 
         final int pid = Hacks.hacks.getPid(javaProcess);
 

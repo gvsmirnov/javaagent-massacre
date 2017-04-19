@@ -48,7 +48,7 @@ public class HelloWorldAgent implements ClassFileTransformer {
 
                 System.out.println("Replacing method " + methodName);
 
-                return generateMainMethod();
+                return generateMainMethod(cw);
             }
         };
 

@@ -24,6 +24,8 @@ public class ExperimentBuilder {
     private boolean logStdOut = false;
     private boolean logStdErr = false;
 
+    private int iterations = 15;
+
     public ExperimentBuilder(String name) {
         Objects.requireNonNull(name, "Experiment name must not be null");
 
@@ -72,9 +74,14 @@ public class ExperimentBuilder {
         return this;
     }
 
+    public ExperimentBuilder iterations(int iterations) {
+        this.iterations = iterations;
+        return this;
+    }
+
     public Experiment build() {
         validate();
-        return new Experiment(outputRoot, buildCommand(), buildMeasurements(), logStdOut, logStdErr);
+        return new Experiment(outputRoot, buildCommand(), buildMeasurements(), logStdOut, logStdErr, iterations);
     }
 
     private List<String> buildCommand() {

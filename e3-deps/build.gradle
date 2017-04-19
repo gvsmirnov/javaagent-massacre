@@ -1,3 +1,93 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.2.RELEASE")
+    }
+}
+
 apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
 
 
+repositories {
+    jcenter()
+}
+
+configurations {
+    agentCompile
+}
+
+dependencies {
+    compile project(':toolbox')
+    compile project(':workbench')
+
+    compile("org.springframework.boot:spring-boot-starter-web") {
+        exclude module : 'logback-classic'
+    }
+
+    compile "net.bytebuddy:byte-buddy:1.6.9"
+
+    agentCompile "net.bytebuddy:byte-buddy:1.6.9"
+    agentCompile "javax.servlet:servlet-api:2.5"
+}
+
+task appJar(type: BootRepackage, dependsOn: 'jar') {
+    classifier  = "application.jar"
+    withJarTask = 'jar'
+    mainClass   = "jug.gvsmirnov.javaagent.deps.HelloWorldController"
+}
+
+task agentJar(type: Jar, dependsOn: ['compileJava']) {
+    archiveName = "agent.jar"
+
+    manifest {
+        attributes(
+                "Premain-Class": "jug.gvsmirnov.javaagent.deps.NsaAgent",
+        )
+    }
+
+    from {
+        configurations.agentCompile.collect {
+            zipTree(it).matching { exclude 'META-INF/**' }
+        }
+    }
+
+    from files(sourceSets.main.output.classesDir)
+
+    exclude 'jug/gvsmirnov/javaagent/deps/HelloWorldController.class'
+}
+
+task runBaseline(dependsOn: appJar, type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    systemProperties = [
+            'app.jar.path': 'build/libs/e3-deps.jar'
+    ]
+
+    main = 'jug.gvsmirnov.javaagent.deps.Setup'
+    args 'baseline'
+}
+
+task runAgent(dependsOn: [agentJar, appJar], type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    systemProperties = [
+            'app.jar.path': 'build/libs/e3-deps.jar',
+            'agent.jar.path': agentJar.archivePath
+    ]
+
+    main = 'jug.gvsmirnov.javaagent.deps.Setup'
+    args 'agent'
+}
+
+
+task runAgentAndTraceClassLoading(dependsOn: [appJar, agentJar], type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    systemProperties = [
+            'app.jar.path': 'build/libs/e3-deps.jar',
+            'agent.jar.path': agentJar.archivePath
+    ]
+
+    main = 'jug.gvsmirnov.javaagent.deps.Setup'
+    args 'agent-tcl'
+}

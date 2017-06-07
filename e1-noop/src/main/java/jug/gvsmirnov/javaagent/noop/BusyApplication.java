@@ -16,7 +16,7 @@ public class BusyApplication {
         long loaded = 0;
 
         while (true) {
-            final Class<?> clazz = BottomlessClassLoader.loadBigClass();
+            final Class<?> clazz = BottomlessClassLoader.loadHugeClass();
             classInstanceSink.add(clazz.newInstance());
 
             if ((loaded++ % 10_000L) == 0L) {

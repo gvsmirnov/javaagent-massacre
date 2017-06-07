@@ -19,9 +19,9 @@ public class JvmtiAgent {
 
     public static native void startNativeAgent();
 
-    public static void onClassLoaded(Class<?> clazz) {
-        System.out.println("Hello, " + clazz);
-    }
+public static void onClassLoaded(Class<?> clazz) {
+    System.out.println("Hello, " + clazz.getSimpleName());
+}
 
     // So, what happens is (if printing just the clazz):
     //  * we try to load sun.launcher.LauncherHelper

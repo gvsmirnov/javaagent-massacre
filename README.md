@@ -1,3 +1,10 @@
+This repo contains a set of examples of java agents and how they blow up in your face.
+
+Below are some explanations of them, but they are half-intentionally kept concise and
+mysterious. Try your best to figure them out on your own, but feel free to ping me if
+you get stuck or need some extra info on any of them.
+
+
 # Example 1: simplest possible agent
 
   1.  Example agent: retransform + return originalBytes
@@ -19,7 +26,7 @@
   6.  Ah shit! Different name formats.
   7.  OK, doing the transformation now.
   8.  WTF? Nothing is happening.
-  9.  Silent exception swallowing? Nice. Get rid of this {{}} shit.
+  9.  Silent exception swallowing? Nice. Get rid of this {{}} stuff.
   10. Ugh, VerifyError. Compute frames.
   11. Success!
 
@@ -52,55 +59,5 @@
   13. Log depth when leaving and exiting
 
   => (see also: https://bugs.openjdk.java.net/browse/JDK-8153202)
-  => We can also fuck up using some other methods as well. Annotations.
-  => CircularClassShit
-
-# Example 5: I just wanted to get some annotations, man
-  => https://bitbucket.org/plumbr/plumbr/pull-requests/3275/fixed-a-deadlocking-issue-during/diff
-
-
-
-# Example 6: perf degradations
-  (These will be slides. Running benches as a demo is too long)
-
-  * Break escape analysis
-  * Bloat methods past inlining threshold
-  * JVMTI tagging: gc epilogue is single-threaded
-  * Add another implementor of a n interface, end up with megamorphic callsites
-
-  -------
-  N. There are some legit things that result in perf degradations. Can't really do anything about it.
-     Tradeoffs, tradeoffs! If your application is fucking slow anyway, you can endure an intrusive agent
-
-# Example N + 1: really weird and misleading verifier shit
-  => https://plumbr.atlassian.net/browse/DTS-2057
-
-  1. WTF, we have this asm verifier. Why does it not help?
-  2. Dump class, try to load
-  2. WTF, why is the class def not found?
-  3. WTF, error changes when using another verifier?
-  4. WTF!!!
-
-----------------------------------------------------------------
-
-Just mention as a list:
-
- * Conflicting resources (version.properties)
-   => https://plumbr.atlassian.net/browse/DTS-2524
-
- * Transforming dynamically created classes (e.g. druid queries)
-   => https://plumbr.atlassian.net/browse/DTS-2548
-
- * Invalid signatures
-   => https://plumbr.atlassian.net/browse/DTS-2580
-
- * Incompatible class change: when using classes from agent
-   and also instrumenting with that agent
-   => https://plumbr.atlassian.net/browse/DTS-2609
-
- * Resource overusage
-   => https://plumbr.atlassian.net/browse/DTS-2511
-
- * Working with other agents
-
-----------------------------------------------------------------
+  => We can also screw up using some other methods as well. Annotations.
+  => CircularClass...

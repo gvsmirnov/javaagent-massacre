@@ -30,7 +30,7 @@ dependencies {
     compile "net.bytebuddy:byte-buddy:1.6.9"
 
     agentCompile "net.bytebuddy:byte-buddy:1.6.9"
-    agentCompile "javax.servlet:servlet-api:2.5"
+//    agentCompile "javax.servlet:servlet-api:2.5"
 }
 
 task appJar(type: BootRepackage, dependsOn: 'jar') {
@@ -44,7 +44,7 @@ task agentJar(type: Jar, dependsOn: ['compileJava']) {
 
     manifest {
         attributes(
-                "Premain-Class": "jug.gvsmirnov.javaagent.deps.NsaAgent",
+                "Premain-Class": "jug.gvsmirnov.javaagent.deps.ServletAgent",
         )
     }
 

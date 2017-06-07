@@ -2,19 +2,19 @@ package jug.gvsmirnov.toolbox;
 
 public class BottomlessClassLoader {
 
-    public static Class<?> loadBigClass() throws ClassNotFoundException {
-        return yourMom.makeAnotherClone();
+    public static Class<?> loadHugeClass() throws ClassNotFoundException {
+        return huge.makeAnotherClone();
     }
 
     public static Class<?> loadTinyClass() throws ClassNotFoundException {
-        return yourDadsDick.makeAnotherClone();
+        return tiny.makeAnotherClone();
     }
 
-    private static final ClassCloningFacility yourMom      = new ClassCloningFacility(YourMom_XXXXXXXXXX.class);
-    private static final ClassCloningFacility yourDadsDick = new ClassCloningFacility(YourDadsDick_XXXXXXXXXX.class);
+    private static final ClassCloningFacility huge = new ClassCloningFacility(HugeClass_XXXXXXXXXX.class);
+    private static final ClassCloningFacility tiny = new ClassCloningFacility(TinyClass_XXXXXXXXXX.class);
 
     // Kudos to @tagir_valeev for this approach: https://habrahabr.ru/post/245333/
-    public static class YourMom_XXXXXXXXXX {
+    public static class HugeClass_XXXXXXXXXX {
         private long a0, a1, a2, a3, a4, a5, a6, a7, a8, a9;
         private long b0, b1, b2, b3, b4, b5, b6, b7, b8, b9;
         private long c0, c1, c2, c3, c4, c5, c6, c7, c8, c9;
@@ -39,6 +39,6 @@ public class BottomlessClassLoader {
         }
     }
 
-    public static class YourDadsDick_XXXXXXXXXX {}
+    public static class TinyClass_XXXXXXXXXX {}
 
 }

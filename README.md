@@ -36,10 +36,10 @@ you get stuck or need some extra info on any of them.
   2.  Run with agent. Why does it no longer find the class?
   3.  Fucking class loaders! Exclude.
   4.  NoSuchMethodError? Why?
-  5.  Avoid instrumenting servlet. WTF?
-  6.  Remove from classpath?
+  5.  Use `hasSuperType`.
+  6.  `NoClassDefFoundError`? Oops, use reflection.
   7.  Can't really get all implementors of a class without loading it? Ugh.
-  8.  Use isAnnotatedWith(Controller) and annotatedWith(RequestMapping)
+  8.  Use `isAnnotatedWith(Controller)` and `annotatedWith(RequestMapping)`
   9.  OK, but we really want to get all the servlets. Let's get back to it.
 
 # Example 4: use JVMTI to track class loading events

@@ -29,7 +29,7 @@ JNIEXPORT void JNICALL Java_jug_gvsmirnov_javaagent_jvmti_JvmtiAgent_startNative
 
     setbuf(stdout, NULL);
 
-    agent_in_java = me;
+    agent_in_java = (*env)->NewGlobalRef(env,me);
     on_class_loaded_method = (*env)->GetStaticMethodID(env, me, "onClassLoaded", "(Ljava/lang/Class;)V");
 
     (*env)->GetJavaVM(env, &vm);
